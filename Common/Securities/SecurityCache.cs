@@ -164,7 +164,6 @@ namespace QuantConnect.Securities
                 }
 
                 if (tick.Value != 0) Price = tick.Value;
-                _lastData = data;
             }
 
             // Only cache non fill-forward data.
@@ -188,6 +187,8 @@ namespace QuantConnect.Securities
 
                 if (data.GetType() == typeof(Tick))
                 {
+                    _lastData = data;
+
                     switch (tick?.TickType)
                     {
                         case TickType.Trade:
@@ -340,6 +341,11 @@ namespace QuantConnect.Securities
         public void Reset()
         {
             _dataByType.Clear();
+            _lastData = null;
+            _lastOHLCUpdate = DateTime.MinValue;
+            _lastQuoteBarUpdate = DateTime.MinValue;
+            _lastTickQuotes = new List<BaseData>();
+            _lastTickTrades = new List<BaseData>();
         }
 
         /// <summary>
@@ -374,6 +380,11 @@ namespace QuantConnect.Securities
                 sourceToShare._dataByType.TryAdd(kvp.Key, kvp.Value);
             }
             targetToModify._dataByType = sourceToShare._dataByType;
+            targetToModify._lastData = sourceToShare._lastData;
+            targetToModify._lastOHLCUpdate = sourceToShare._lastOHLCUpdate;
+            targetToModify._lastQuoteBarUpdate = sourceToShare._lastQuoteBarUpdate;
+            targetToModify._lastTickTrades = sourceToShare._lastTickTrades;
+            targetToModify._lastTickQuotes = sourceToShare._lastTickQuotes;
         }
     }
 }
